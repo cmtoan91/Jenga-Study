@@ -15,10 +15,6 @@ public class SerializedDictionary<TKey, TValue> : IDictionary<TKey, TValue>, ISe
     [SerializeField]
     Dictionary<TKey, int> indexByKey = new Dictionary<TKey, int>();
 
-
-    [SerializeField, HideInInspector]
-    bool keyCollision;
-
     public ICollection<TKey> Keys => dict.Keys;
 
     public ICollection<TValue> Values => dict.Values;
@@ -121,7 +117,6 @@ public class SerializedDictionary<TKey, TValue> : IDictionary<TKey, TValue>, ISe
     {
         dict.Clear();
         indexByKey.Clear();
-        keyCollision = false;
 
         for (int i = 0; i < list.Count; i++)
         {
@@ -130,10 +125,6 @@ public class SerializedDictionary<TKey, TValue> : IDictionary<TKey, TValue>, ISe
             {
                 dict.Add(key, list[i].Value);
                 indexByKey.Add(key, i);
-            }
-            else
-            {
-                keyCollision = true;
             }
         }
     }

@@ -2,19 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
-public class StackManager : MonoBehaviour
+public class StackManager : SimpleSingleton<StackManager>
 {
-    public static StackManager Instance;
-
-    private void Awake()
-    {
-        if (Instance == null)
-            Instance = this;
-        else
-            Destroy(gameObject);
-    }
-
-
     [SerializeField]
     StackHolder _stackPrefab;
 
@@ -28,9 +17,12 @@ public class StackManager : MonoBehaviour
     float _distanceBetweenStacks = 10f;
 
     public SerializedDictionary<BlockType, Material> MaterialLibrary;
+    List<StackHolder> _allStacks = new List<StackHolder>();
+
 
     public void CreateStacks(List<BlockData> allBlockDatas)
     {
+        _allStacks = new List<StackHolder>();
         Dictionary<string, List<BlockData>> blockDataCatalogs = new Dictionary<string, List<BlockData>>();
         foreach(BlockData blockData in allBlockDatas)
         {
@@ -45,13 +37,43 @@ public class StackManager : MonoBehaviour
 
         foreach(string grade in blockDataCatalogs.Keys)
         {
-            List<BlockData> rearranged = blockDataCatalogs[grade].OrderBy(x => x.grade).ToList();
+            if (!grade.Contains("Grade")) continue;
+            List<BlockData> rearranged = blockDataCatalogs[grade].OrderBy(x => x.cluster).ToList();
+            rearranged = rearranged.OrderBy(x => x.domain).ToList();
             StackHolder stack = Instantiate(_stackPrefab, currentPos, Quaternion.identity);
             stack.Init(grade);
             stack.BuildStack(_blockPrefab, rearranged);
             currentPos += Vector3.right * _distanceBetweenStacks;
+            if (grade == "7th Grade") CameraController.Instance.FocusTarget(stack.transform);
+            GlobalPubSub.PublishEvent<StackCreationMessage>(new StackCreationMessage(stack));
+            _allStacks.Add(stack);
+        }
+
+        StackFunctionalitySetupMessage funcSetupMsg = new StackFunctionalitySetupMessage();
+        funcSetupMsg.AllFunctionality.Add("Test Stack", TestMyStack);
+        funcSetupMsg.AllFunctionality.Add("Reset", ResetStack);
+        GlobalPubSub.PublishEvent<StackFunctionalitySetupMessage>(funcSetupMsg);
+    }
+
+    public void SelectStack(StackHolder stack)
+    {
+        CameraController.Instance.FocusTarget(stack.transform);
+    }
+
+    public void TestMyStack()
+    {
+        foreach(StackHolder stack in _allStacks)
+        {
+            stack.TestStack();
         }
     }
 
+    public void ResetStack()
+    {
+        foreach (StackHolder stack in _allStacks)
+        {
+            stack.Reset();
+        }
+    }
 
 }

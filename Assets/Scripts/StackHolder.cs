@@ -1,10 +1,14 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
 
 public class StackHolder: MonoBehaviour
 {
     public string StackName;
+
+    [SerializeField]
+    TMP_Text _text;
 
     [SerializeField]
     float _blockWidth = 2.5f;
@@ -15,6 +19,7 @@ public class StackHolder: MonoBehaviour
     public void Init(string name)
     {
         StackName = name;
+        if (_text != null) _text.text = name;
     }
 
     public void BuildStack(Block blockPrefab, List<BlockData> blockData)
@@ -47,6 +52,45 @@ public class StackHolder: MonoBehaviour
             _categorizedBlocks[block.Type] = new List<Block>();
         }
         _categorizedBlocks[block.Type].Add(block);
+    }
+
+    public void TestStack()
+    {
+        if(_categorizedBlocks.TryGetValue(BlockType.Glass, out var glassBlocks))
+        {
+            foreach(Block block in glassBlocks)
+            {
+                block.gameObject.SetActive(false);
+            }
+        }
+
+        if (_categorizedBlocks.TryGetValue(BlockType.Wood, out var woodBlocks))
+        {
+            foreach (Block block in woodBlocks)
+            {
+                block.TriggerPhysic();
+            }
+        }
+
+        if (_categorizedBlocks.TryGetValue(BlockType.Stone, out var stoneBlocks))
+        {
+            foreach (Block block in stoneBlocks)
+            {
+                block.TriggerPhysic();
+            }
+        }
+    }
+
+    public void Reset()
+    {
+        foreach(List<Block> blocks in _categorizedBlocks.Values)
+        {
+            foreach (Block block in blocks)
+            {
+                block.gameObject.SetActive(true);
+                block.ResetBlock();
+            }
+        }
     }
 }
 

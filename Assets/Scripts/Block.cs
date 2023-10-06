@@ -15,17 +15,14 @@ public class Block : MonoBehaviour
     Rigidbody _rb;
 
     public BlockType Type;
-    public int BlockID;
-
-    public string BlockDescription;
+    public BlockData Data;
     public Vector3 BlockOriginalPosition { get; set; }
     public Quaternion BlockOriginalRotation { get; set; }
     
     public void Init(BlockData data, Vector3 orgPos, Quaternion rotation)
     {
         Type = (BlockType)data.mastery;
-        BlockID = data.id;
-        BlockDescription = data.standarddescription;
+        Data = data;
         BlockOriginalPosition = orgPos;
         BlockOriginalRotation = rotation;
 
@@ -60,12 +57,20 @@ public class Block : MonoBehaviour
     {
         transform.position = BlockOriginalPosition;
         transform.rotation = BlockOriginalRotation;
-        _rb.isKinematic = false;
+        _rb.isKinematic = true;
     }
 
     public void TriggerPhysic()
     {
-        _rb.isKinematic = true;
+        _rb.isKinematic = false;
+    }
+
+    public void OnSelect(bool isSelected)
+    {
+        if (isSelected)
+            _renderer.material.color = Color.red;
+        else
+            _renderer.material.color = Color.white;
     }
 }
 

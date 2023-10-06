@@ -7,10 +7,9 @@ using Newtonsoft.Json.Converters;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-public class GameManager : MonoBehaviour
+public class GameManager : SimpleSingleton<GameManager>
 {
     public string ApiLink;
-
 
     private void Start()
     {
