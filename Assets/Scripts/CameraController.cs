@@ -32,7 +32,6 @@ public class CameraController : SimpleSingleton<CameraController>
     float _scrollSpeed = 10f;
 
     Vector3 _targetPosition;
-    float _currentHorizontalAngle = 0;
     float _targetHorizontalAngle = 0;
     float _currentXAxisEuler;
 
@@ -51,8 +50,8 @@ public class CameraController : SimpleSingleton<CameraController>
     {
         _focusTarget = focusTarget;
         _targetHorizontalAngle = 0;
-        _targetPosition = GetPosition(_targetHorizontalAngle);
         _currentXAxisEuler = _baseXAxisEuler;
+        _targetPosition = GetPosition(_targetHorizontalAngle);
     }
 
     public Vector3 GetPosition(float horizontalAngle)
@@ -65,7 +64,6 @@ public class CameraController : SimpleSingleton<CameraController>
         targetPosition.y = positionAtZero.y;
         float distanceToCenterLine = (positionAtZero - targetPosition).magnitude;
         targetPosition += distanceToCenterLine * targetDir;
-        _currentHorizontalAngle = horizontalAngle;
         return targetPosition;
     }
 
@@ -97,7 +95,6 @@ public class CameraController : SimpleSingleton<CameraController>
                 else if (_currentXAxisEuler < _minXAxisEuler) _currentXAxisEuler = _minXAxisEuler;
             }
             _targetPosition = GetPosition(_targetHorizontalAngle);
-            _currentHorizontalAngle = _targetHorizontalAngle;
         }
 
         if (Input.GetButtonUp("Fire2"))
